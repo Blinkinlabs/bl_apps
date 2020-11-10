@@ -1,0 +1,3 @@
+// Note: BL uses the BGA package so the format is: set <signal name> <ball number?>
+set_io LED      IO_22
+set_io BUTTON   IO_18
