@@ -1,0 +1,42 @@
+# Note: BL uses the BGA package so the format is: set <signal name> <ball number?>
+
+# Note: Aliases are supported for pin names, but there is a bug:
+# https://github.com/QuickLogic-Corp/quicklogic-fpga-toolchain/issues/23
+
+set_io LED     IO_22
+set_io BUTTON  IO_18
+
+# Header P1 (counterclockwise)
+set_io OUT_0   IO_16
+set_io OUT_1   IO_24
+set_io OUT_2   G1	#IO_45
+set_io OUT_3   E1	#IO_44
+set_io OUT_4   D1	#IO_43
+set_io OUT_5   D2	#IO_40
+set_io OUT_6   H4	#IO_32
+set_io OUT_7   IO_28
+set_io OUT_8   IO_27
+set_io OUT_9   IO_25
+set_io OUT_10  IO_23
+set_io OUT_11  IO_21
+set_io OUT_12  IO_17
+
+# Header P2 (counterclockwise)
+set_io OUT_13  IO_14
+set_io OUT_14  IO_10
+set_io OUT_15  IO_7
+set_io OUT_16  IO_6
+set_io OUT_17  IO_4
+set_io OUT_18  IO_3
+set_io OUT_19  IO_2
+set_io OUT_20  IO_1
+set_io OUT_21  IO_0
+
+# Header 5
+set_io OUT_22  IO_20
+set_io OUT_23  IO_19
+set_io OUT_24  IO_9
+set_io OUT_25  IO_8
+
+
+
