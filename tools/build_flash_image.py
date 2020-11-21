@@ -33,6 +33,7 @@ parser.add_argument("-bootloader", help="Path to bootloader image", type=str,
 parser.add_argument("-bootfpga", help="Path to bootfpga image", type=str,
         default="../bl_bootloader/fpga/usb2serial.bin")
 parser.add_argument("-M4app", help="Path to application image", type=str)
+parser.add_argument("-output", help="Output filename", type=str, default="image.bin")
 
 args_dict = vars(parser.parse_args())
 
@@ -89,5 +90,7 @@ for item,props in image_layout.items():
 if (len(image) % 0x1000) != 0:
     print("warning: image not aligned to 4k sector size, may need padding before upload.")
 
-outfile = open('image.bin', 'wb')
+outfile = open(args_dict['output'],'wb')
 outfile.write(image)
+
+print("Wrote 0x{:x} bytes to {}".format(len(image), args_dict['output']))
