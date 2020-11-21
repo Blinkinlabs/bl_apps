@@ -1,3 +1,17 @@
+# Bootloader
+
+This is a fork of the Quickfeather bootloader. The only differences so far are re-assignment of the user button to match the new hardware, and the removal of two of the LEDs which are not present on the new board.
+
+Wishlist is:
+
+* Immediate boot-to-app on cold boot
+* Stay in bootloader forever after warm reset
+* USB-Serial that can be built with open tools
+* DFU instead of TinyFPGA bootloader?
+
+
+## Notes from Quickfeather:
+
 The QuickFeather bootloader has a flash memory map for 5 bin files, and corresponding CRC for each of them. The 5 bin files are:
 
     bootloader
@@ -25,8 +39,7 @@ appfpga	        |Future	|0x0004_0000|	0x0002_0000|	0x0005_FFFF	|	 262,144 |	 131
 appffe	        |Future	|0x0006_0000|	0x0002_0000|	0x0007_FFFF	|	 393,216 |	 131,072 |	 524,288 
 M4app	        |Used	|0x0008_0000|	0x0006_E000|	0x000E_DFFF	|	 524,288 |	 450,560 |	 974,848 
 
-Communication Interface
------------------------
+## Communication Interface
 
 This bootloader project uses USB-Serial interface available on the Quickfeather board to receive and transmit commands from TinyFPGA Programmer.  
 
