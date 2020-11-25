@@ -74,6 +74,9 @@ static void system_init(void)
     S3x_Clk_Enable(S3X_FB_16_CLK);
     S3x_Clk_Enable(S3X_FB_21_CLK);
 
+    // TODO: This doesn't seem to work, we'd like to set this to 40MHz to get a 20MHz SPI clock
+//    S3x_Clk_Set_Rate(S3X_A1_CLK, (UINT32_t)(40000000));
+
     S3x_Clk_Enable(S3X_A1_CLK);
     S3x_Clk_Enable(S3X_CFG_DMA_A1_CLK);
 
@@ -94,9 +97,8 @@ static void ldo_init(void)
 */
 static void SPIM_Setup(void)
 {
-  
     //SPI master init for SPI flash
-    spiFlashHandle.Init.ucFreq       = SPI_BAUDRATE_5MHZ; //above 5MHz does not work
+    spiFlashHandle.Init.ucFreq       = SPI_BAUDRATE_20MHZ;
     spiFlashHandle.Init.ucSPIInf     = SPI_4_WIRE_MODE;
     spiFlashHandle.Init.ucSSn        = SPI_SLAVE_1_SELECT;
     spiFlashHandle.Init.ulCLKPhase   = SPI_PHASE_1EDGE;
@@ -104,6 +106,7 @@ static void SPIM_Setup(void)
     spiFlashHandle.Init.ulDataSize   = SPI_DATASIZE_8BIT;
     spiFlashHandle.Init.ulFirstBit   = SPI_FIRSTBIT_MSB;
     spiFlashHandle.ucSPIx            = SPI1_MASTER_SEL;
+
 
     if(HAL_SPI_Init(&spiFlashHandle) != HAL_OK)
     {
