@@ -194,11 +194,32 @@ static void BLTaskHandler(void *pvParameters)
 {
     int wait_time_msec = 0;
 
+    // Check if the app requested bootloader mode
     if(REBOOT_STATUS_REG == REBOOT_CAUSE_FLASHING) {
-        dbg_str("Bootloader magic number detected, starting bootloader\n");
+        // Clear the request so we don't get into the bootloader on next reset
+        REBOOT_STATUS_REG = 0;
+
+        dbg_str("Bootloader magic number detected, switching to download mode\n");
         do_bootloader();
     }
 
+    // Check if the user button is being held down, and if so jump to the bootloader
+    uint8_t gpio_value = 1;
+    HAL_GPIO_Read(USER_BUTTON_GPIO_NUM, &gpio_value);
+    if(gpio_value == 0) {
+        dbg_str("User button pressed: switching to download mode\n");
+        do_bootloader();
+    }
+
+    // If there is an app present, load it
+    dbg_str("User button not pressed: proceeding to load application\n");
+    int error = load_m4app(); //this should never return
+
+    // Otherwise, go into bootloader mode
+    dbg_str("Error loading user app: switching to download mode\n");
+    do_bootloader();
+
+#if 0
 	while(1)
 	{
       // green led indicates waiting for button press
@@ -232,7 +253,9 @@ static void BLTaskHandler(void *pvParameters)
         }
       }
 	}
+#endif
 }
+
 /*!
 * \fn void BL_Task_Init()
 * \brief  Init function to create BootloaderTask to be called from main()
