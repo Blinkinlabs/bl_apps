@@ -38,7 +38,7 @@ extern int load_m4app(void);
 extern int load_usb_flasher(void);
 
 #define MAX_BOOTLOADER_WAIT_MSEC  (5*1000)
-#define MIN_USER_BTN_PRESS_WAIT_MSEC  (200)
+#define MIN_USER_BTN_PRESS_WAIT_MSEC  (50)
 #define USER_BUTTON_GPIO_NUM      (4) //PAD 18, GPIO is connected to User Button
 #define BLUE_LED_GPIO_NUM         (6) //PAD xx, GPIO is connected to Blue LED
 #define GREEN_LED_GPIO_NUM        (6) //PAD xx, GPIO is connected to Green LED
@@ -163,6 +163,24 @@ void toggle_red_led(int toggle_time_msec)
   return;
 }
 
+
+static void do_bootloader()
+{
+    set_waiting_led(0);
+    set_downloading_led(1);
+    int error = load_usb_flasher(); //this should never return
+    //if can not load USB FPGA image, it is fatal error. wait indefinitely
+    while(1)
+    {
+      //set red LED for error and turn off green LED
+      set_boot_error_led(1);
+      set_downloading_led(0);
+      dbg_str("ERROR loading USB FPGA Image. Please re-flash USB FPGA Image .. \n");
+      dbg_str("Press Reset, then User Button and start Flash script .. \n\n");
+      vTaskDelay(5*1000);
+    }
+}
+
 /*
 * This BootLoader Task will do 2 things.
 * 1. Wait for 5sec for the User Button to be pressed.
@@ -176,6 +194,11 @@ static void BLTaskHandler(void *pvParameters)
 {
     int wait_time_msec = 0;
 
+    if(REBOOT_STATUS_REG == REBOOT_CAUSE_FLASHING) {
+        dbg_str("Bootloader magic number detected, starting bootloader\n");
+        do_bootloader();
+    }
+
 	while(1)
 	{
       // green led indicates waiting for button press
@@ -187,19 +210,7 @@ static void BLTaskHandler(void *pvParameters)
       {
         //Acknowledge User Button press
         dbg_str("User button pressed: switch to download mode\n");
-        set_waiting_led(0);
-        set_downloading_led(1);
-        int error = load_usb_flasher(); //this should never return
-        //if can not load USB FPGA image, it is fatal error. wait indefinitely
-        while(1)
-        {
-          //set red LED for error and turn off green LED
-          set_boot_error_led(1);
-          set_downloading_led(0);
-          dbg_str("ERROR loading USB FPGA Image. Please re-flash USB FPGA Image .. \n");
-          dbg_str("Press Reset, then User Button and start Flash script .. \n\n");
-          vTaskDelay(5*1000);
-        }
+        do_bootloader();
       }
       //wait for a maximum of 3 secs before loading M4 App
       vTaskDelay(1);
