@@ -59,10 +59,7 @@ int main(void)
 
     qf_hardwareSetup();
 
-    int ret = S3x_Clk_Set_Rate(S3X_A1_CLK, (UINT32_t)(40000000));
-    char buf[30];
-    snprintf(buf, sizeof(buf), "set rate:%i",ret);
-    dbg_str(buf);
+   // int ret = S3x_Clk_Set_Rate(S3X_A1_CLK, (UINT32_t)(40000000));
     
     dbg_str("\n\n");
     dbg_str( "##########################\n");

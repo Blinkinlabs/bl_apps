@@ -74,8 +74,8 @@ static void system_init(void)
     S3x_Clk_Enable(S3X_FB_16_CLK);
     S3x_Clk_Enable(S3X_FB_21_CLK);
 
-    // TODO: This doesn't seem to work, we'd like to set this to 40MHz to get a 20MHz SPI clock
-//    S3x_Clk_Set_Rate(S3X_A1_CLK, (UINT32_t)(40000000));
+    // TODO: Check what clock frequency we actually achieved here
+    S3x_Clk_Set_Rate(S3X_A1_CLK, (UINT32_t)(40000000));
 
     S3x_Clk_Enable(S3X_A1_CLK);
     S3x_Clk_Enable(S3X_CFG_DMA_A1_CLK);
