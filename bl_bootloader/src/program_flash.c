@@ -140,13 +140,52 @@ void program_flash( void *pParameter )
             spi_flash_cmd(atflCmd, kbWrite, atflResponse, kbRead, CMD_NoResponse);
             break;
         case 0x02:
-            xaddr = (atflCmd[1] << 16) | (atflCmd[2] << 8) | atflCmd[3];
-            xval = (atflCmd[7] << 24) |(atflCmd[6] << 16) | (atflCmd[5] << 8) | atflCmd[4];
-            xret = spi_flash_program(atflCmd, 4, &atflCmd[4], kbWrite-4, NULL);
-            if (xret != FlashOperationSuccess) {
-                dbg_str("Page Program failed\n");
-                while (1);
+            // Workaround for bug in the HAL- if a write with an odd-numbered length greater
+            // than 127 is requested, only 127 bytes of data will be written.
+            // To avoid this, split the request into an even-length write, then a single byte
+            // write.
+            {
+                size_t data_len_initial = (kbWrite-4);
+
+                bool tx_last_odd_bit = false;
+                if(((data_len_initial % 2) == 1) && (data_len_initial > 127)) {
+                    data_len_initial = data_len_initial - 1;
+                    tx_last_odd_bit = true;
+                }
+
+                // atflCmd[0] is 0x02
+                // atflCmd[1]-[3] is the destination address
+                // atflCmd[4-n] is the data
+                xaddr = (atflCmd[1] << 16) | (atflCmd[2] << 8) | atflCmd[3];
+
+
+                xret = spi_flash_program(atflCmd, 4, &atflCmd[4], data_len_initial, NULL);
+                if (xret != FlashOperationSuccess) {
+                    dbg_str("Page Program failed\n");
+                    while (1);
+                }
+
+                if(tx_last_odd_bit) {
+                    // Wait for the last command to finish
+                    while(IsSPIFlashBusy(0x1)) {}
+
+                    // Send a write enable
+                    char we_command[] = {0x06};
+                    spi_flash_cmd(we_command, 1, atflResponse, 0, CMD_NoResponse);
+
+                    xaddr += data_len_initial;
+                    atflCmd[1] = ((xaddr >> 16) & 0xFF);
+                    atflCmd[2] = ((xaddr >> 8) & 0xFF);
+                    atflCmd[3] = ((xaddr >> 0) & 0xFF);
+
+                    xret = spi_flash_program(atflCmd, 4, &atflCmd[4+data_len_initial], 1, NULL);
+                    if (xret != FlashOperationSuccess) {
+                        dbg_str("Page Program failed\n");
+                        while (1);
+                    }
+                }
             }
+            
             break;
         case 0x0B:
             xaddr = (atflCmd[1] << 16) | (atflCmd[2] << 8) | atflCmd[3];
