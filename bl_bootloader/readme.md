@@ -1,11 +1,16 @@
 # Bootloader
 
-This is a fork of the Quickfeather bootloader. The only differences so far are re-assignment of the user button to match the new hardware, and the removal of two of the LEDs which are not present on the new board.
+This is a fork of the Quickfeather bootloader.
+
+Changes so far:
+* Update button and LED peripherals to match board
+* Immediate boot-to-app on cold boot
+* If user button held down during reset, stay in bootloader
+* Implement 'magic number' support to allow user firmware to reset the chip back to bootloader mode
+* Workaround for bug in SPI HAL that can cause certain firmware lengths to fail to upload correctly
 
 Wishlist is:
 
-* Immediate boot-to-app on cold boot
-* Stay in bootloader forever after warm reset
 * USB-Serial that can be built with open tools
 * DFU instead of TinyFPGA bootloader?
 
